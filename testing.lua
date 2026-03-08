@@ -339,35 +339,21 @@ if LocalPlayer.Character then
     startFollowing()
 end
 
--- ===== AUTO SUMMON STAND (WHEN LOCKED ONTO JOTARO) =====
+-- ===== SUMMON STAND ONCE =====
 task.spawn(function()
-
-    while true do
-        
-        task.wait(0.5)  -- Check every half second
-        
-        local target = getTarget()  -- Get current Jotaro target
-        local liveChar = getLiveCharacter()
-        
-        -- Only summon stand if:
-        -- 1. We have a target (locked onto Jotaro)
-        -- 2. We have a character
-        if target and liveChar and LocalPlayer.Character then
-            
-            local controller = LocalPlayer.Character:FindFirstChild("client_character_controller")
-            
-            if controller and controller:FindFirstChild("SummonStand") then
-                controller.SummonStand:FireServer()
-                sendDiscordMessage("⭐ Stand summon fired (locked onto: "..target.Name..")")
-                
-                -- Optional: Add a small delay to prevent spam
-                task.wait(1)
-            end
-            
-        end
-        
+    -- Wait for character to be ready
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    
+    -- Wait a moment for everything to load
+    task.wait(2)
+    
+    -- Find and fire the remote
+    local controller = character:FindFirstChild("client_character_controller")
+    if controller and controller:FindFirstChild("SummonStand") then
+        controller.SummonStand:FireServer()
+        sendDiscordMessage("⭐ Stand summoned once")
+        print("✅ Stand summon fired")
     end
-
 end)
 
 -- ===== INITIAL EXECUTION =====
@@ -376,3 +362,4 @@ autoQuickPlay()
 task.wait(2)
 
 sendDiscordMessage("✅ Script fully loaded and running!")
+

@@ -71,43 +71,43 @@ local function getLiveCharacter()
     end
 end
 
--- ===== AUTO RETRY WITH SAFETY =====
+-- ===== FIXED AUTO RETRY =====
 task.spawn(function()
     while true do
-        task.wait(2) -- Check every 2 seconds instead of 1
+        task.wait(2)
         
         local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
         local character = LocalPlayer.Character
         
-        -- Only retry if we have a valid character and the raid complete screen
         if playerGui and playerGui:FindFirstChild("raidcomplete") and character then
             
-            -- Add random delay to appear less bot-like (1-3 seconds)
             local randomDelay = math.random(10, 30) / 10
             task.wait(randomDelay)
             
-            -- Check if screen still exists (player didn't manually retry)
             if playerGui:FindFirstChild("raidcomplete") then
                 print("🔄 Retrying raid...")
-                ReplicatedStorage.requests.character.retryraid:FireServer()
                 
-                -- Wait extra time after retry to avoid multiple triggers
+                -- Fixed path based on your structure
+                local retryRemote = ReplicatedStorage:WaitForChild("requests"):WaitForChild("character"):WaitForChild("retryraid")
+                retryRemote:FireServer()
+                
                 task.wait(5)
             end
         end
     end
 end)
 
--- ===== AUTO QUICK PLAY =====
+-- ===== FIXED AUTO QUICK PLAY =====
 local function autoQuickPlay()
-
-    local spawnRemote = ReplicatedStorage.requests.character:WaitForChild("spawn")
-
+    -- Wait for the correct path based on your game structure
+    local requests = ReplicatedStorage:WaitForChild("requests")
+    local characterRequests = requests:WaitForChild("character")
+    local spawnRemote = characterRequests:WaitForChild("spawn")
+    
     spawnRemote:FireServer()
-
+    
     LocalPlayer.CharacterAdded:Wait()
     task.wait(0.2)
-
 end
 
 -- ===== NOTIFICATION WATCHER =====
